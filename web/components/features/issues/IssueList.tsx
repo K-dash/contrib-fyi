@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useIssueSearch } from '@/hooks/useIssueSearch';
 import { IssueRow } from './IssueRow';
 import { IssueRowSkeleton } from './IssueRowSkeleton';
@@ -18,6 +19,10 @@ export function IssueList() {
     totalPages,
     resetFilters,
   } = useIssueSearch();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [page]);
 
   const handleRetry = () => {
     refresh();

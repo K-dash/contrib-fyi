@@ -1,4 +1,9 @@
 import { STORAGE_KEYS } from '@/lib/constants/storageKeys';
+import {
+  encodeToken,
+  decodeToken,
+  LEGACY_TOKEN_KEY,
+} from '@/lib/store/tokenEncoding';
 
 export class TokenService {
   private static instance: TokenService;
@@ -15,39 +20,43 @@ export class TokenService {
       return process.env.NEXT_PUBLIC_GITHUB_TOKEN ?? null;
     }
 
-    // Prefer sessionStorage (aligned with useTokenStore)
-    const sessionEncoded = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
-    if (sessionEncoded) {
-      try {
-        return atob(JSON.parse(sessionEncoded)?.state?.token ?? '');
-      } catch {
-        // fall through to other sources
-      }
+    try {
+      const sessionEncoded = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
+      if (!sessionEncoded) return null;
+      const stored = JSON.parse(sessionEncoded)?.state?.token;
+      if (!stored) return null;
+      const decoded = decodeToken(stored);
+      return decoded || null;
+    } catch {
+      // SecurityError in privacy mode, JSON parse failures, etc.
+      return null;
     }
-
-    // Fallback: legacy localStorage key
-    const legacy = localStorage.getItem('github_token');
-    if (legacy) return legacy;
-
-    return null;
   }
 
   setToken(token: string) {
     if (typeof window === 'undefined') return;
     try {
-      const encoded = btoa(token);
+      const encoded = encodeToken(token);
       sessionStorage.setItem(
         STORAGE_KEYS.TOKEN,
         JSON.stringify({ state: { token: encoded } })
       );
     } catch {
-      sessionStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      // sessionStorage unavailable (privacy mode, quota, etc.)
     }
   }
 
   clearToken() {
     if (typeof window === 'undefined') return;
-    sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
-    localStorage.removeItem('github_token');
+    try {
+      sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+    } catch {
+      // ignore
+    }
+    try {
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
+    } catch {
+      // ignore
+    }
   }
 }

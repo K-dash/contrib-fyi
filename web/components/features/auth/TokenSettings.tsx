@@ -80,8 +80,12 @@ export function TokenSettings() {
               repository info.
             </p>
             <p className="text-muted-foreground text-xs italic">
-              🔒 Stored securely in this browser session only and never sent to
-              our servers.
+              🔒 Stored in this browser&apos;s session storage. The app sends
+              the token only to GitHub&apos;s API; we don&apos;t run a backend.
+            </p>
+            <p className="text-muted-foreground text-xs">
+              No scopes required &mdash; this app only reads public data. Leave
+              all scopes unchecked when creating the token.
             </p>
           </div>
 
@@ -157,7 +161,7 @@ export function TokenSettings() {
 
           <div className="border-t pt-3">
             <a
-              href="https://github.com/settings/tokens/new?description=Contrib.fyi&scopes=public_repo"
+              href="https://github.com/settings/tokens/new?description=Contrib.fyi"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Header } from '@/components/layout/Header';
@@ -30,6 +31,11 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
           </div>
         </ThemeProvider>
+        <Script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "616182a8075d430698713cd4be9028a1"}'
+        />
       </body>
     </html>
   );

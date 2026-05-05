@@ -20,31 +20,43 @@ export class TokenService {
       return process.env.NEXT_PUBLIC_GITHUB_TOKEN ?? null;
     }
 
-    const sessionEncoded = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
-    if (!sessionEncoded) return null;
-
     try {
+      const sessionEncoded = sessionStorage.getItem(STORAGE_KEYS.TOKEN);
+      if (!sessionEncoded) return null;
       const stored = JSON.parse(sessionEncoded)?.state?.token;
       if (!stored) return null;
       const decoded = decodeToken(stored);
       return decoded || null;
     } catch {
+      // SecurityError in privacy mode, JSON parse failures, etc.
       return null;
     }
   }
 
   setToken(token: string) {
     if (typeof window === 'undefined') return;
-    const encoded = encodeToken(token);
-    sessionStorage.setItem(
-      STORAGE_KEYS.TOKEN,
-      JSON.stringify({ state: { token: encoded } })
-    );
+    try {
+      const encoded = encodeToken(token);
+      sessionStorage.setItem(
+        STORAGE_KEYS.TOKEN,
+        JSON.stringify({ state: { token: encoded } })
+      );
+    } catch {
+      // sessionStorage unavailable (privacy mode, quota, etc.)
+    }
   }
 
   clearToken() {
     if (typeof window === 'undefined') return;
-    sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(LEGACY_TOKEN_KEY);
+    try {
+      sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+    } catch {
+      // ignore
+    }
+    try {
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
+    } catch {
+      // ignore
+    }
   }
 }

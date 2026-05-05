@@ -46,12 +46,14 @@ describe('TokenService', () => {
     expect(token).toBe('abc123');
   });
 
-  it('falls back to legacy localStorage token', () => {
+  it('does not fall back to legacy localStorage token', () => {
+    // legacy fallback was a token-leak path: cleared sessions appeared empty
+    // in the UI but the legacy key kept being sent as a Bearer header.
     sessionStorage.setItem(STORAGE_KEYS.TOKEN, 'not-json');
     localStorage.setItem('github_token', 'legacy-token');
 
     const token = service.getToken();
-    expect(token).toBe('legacy-token');
+    expect(token).toBeNull();
   });
 
   it('setToken stores encoded token and getToken decodes it', () => {

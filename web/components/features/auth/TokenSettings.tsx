@@ -80,8 +80,8 @@ export function TokenSettings() {
               repository info.
             </p>
             <p className="text-muted-foreground text-xs italic">
-              🔒 Kept only in this browser&apos;s session storage. Sent
-              exclusively to GitHub&apos;s API, never to our servers.
+              🔒 Stored in this browser&apos;s session storage. The app sends
+              the token only to GitHub&apos;s API; we don&apos;t run a backend.
             </p>
             <p className="text-muted-foreground text-xs">
               No scopes required &mdash; this app only reads public data. Leave
